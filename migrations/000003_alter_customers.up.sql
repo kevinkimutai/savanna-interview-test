@@ -1,0 +1,2 @@
+ALTER TABLE customers
+ADD COLUMN email VARCHAR NOT NULL;

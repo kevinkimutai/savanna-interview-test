@@ -1,0 +1,14 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries:
+      - ./sqlc/queries/customers.sql
+      - ./sqlc/queries/products.sql
+      - ./sqlc/queries/orders.sql
+      - ./sqlc/queries/order-details.sql
+    schema: "./migrations"
+    gen:
+      go:
+        package: "queries"
+        out: "./internal/adapters/queries"
+        sql_package: "pgx/v5"
