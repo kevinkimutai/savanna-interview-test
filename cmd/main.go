@@ -31,7 +31,7 @@ func main() {
 	DBURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
 		POSTGRES_USERNAME,
 		POSTGRES_PASSWORD,
-		"localhost",
+		"postgresdb",
 		DATABASE_PORT,
 		"orderdb")
 

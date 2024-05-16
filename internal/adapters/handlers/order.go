@@ -17,10 +17,22 @@ func NewOrderService(api ports.OrderApiPort) *OrderService {
 	return &OrderService{api: api}
 }
 
+// CreateOrder godoc
+// @Summary      Create a new order
+// @Description  Creates a new order with the provided order items.
+// @Tags         orders
+// @Accept       json
+// @Produce      json
+// @Param        id   path      int    true  "Customer ID"
+// @Param        orderItems body []domain.OrderItemRequest true "Order items to be added"
+// @Success      201  {object} domain.OrderResponse "Returns the newly created order"
+// @Failure      400  {object} domain.ErrorResponse      "Bad request, invalid input"
+// @Failure      404  {object} domain.ErrorResponse      "Customer not found"
+// @Failure      500  {object} domain.ErrorResponse      "Internal server error"
+// @Router       /order [post]
 func (s *OrderService) CreateOrder(c *fiber.Ctx) error {
 	//Get CustomerID
 	cus := c.Locals("customer")
-	fmt.Println("CUSTOMER", cus)
 
 	customer, ok := cus.(queries.Customer)
 	if !ok {
@@ -62,6 +74,18 @@ func (s *OrderService) CreateOrder(c *fiber.Ctx) error {
 			Data:       order})
 }
 
+// GetAllOrders godoc
+// @Summary      Get all orders
+// @Description  Retrieves all orders based on the provided query parameters.
+// @Tags         orders
+// @Produce      json
+// @Param        page query int false "Page number"
+// @Param        limit query int false "Number of orders per page"
+// @Param        sortBy query string false "Sort by field"
+// @Param        sortOrder query string false "Sort order ('asc' or 'desc')"
+// @Success      200  {object} domain.OrdersResponse "Successfully retrieved orders"
+// @Failure      500  {object} domain.ErrorResponse  "Internal server error"
+// @Router       /order [get]
 func (s *OrderService) GetAllOrders(c *fiber.Ctx) error {
 	//Get Query Params
 	m := c.Queries()
@@ -90,6 +114,17 @@ func (s *OrderService) GetAllOrders(c *fiber.Ctx) error {
 		})
 }
 
+// GetOrderByID godoc
+// @Summary      Get order by ID
+// @Description  Retrieves an order based on the provided order ID.
+// @Tags         orders
+// @Accept       json
+// @Produce      json
+// @Param        orderID path string true "Order ID"
+// @Success      200  {object} domain.OrderResponse "Successfully retrieved order"
+// @Failure      404  {object} domain.ErrorResponse  "Order not found"
+// @Failure      500  {object} domain.ErrorResponse  "Internal server error"
+// @Router       /order/{orderID} [get]
 func (s *OrderService) GetOrderByID(c *fiber.Ctx) error {
 	orderID := c.Params("orderID")
 
@@ -110,6 +145,17 @@ func (s *OrderService) GetOrderByID(c *fiber.Ctx) error {
 			Data:       order})
 }
 
+// DeleteOrder godoc
+// @Summary      Delete order by ID
+// @Description  Deletes an order based on the provided order ID.
+// @Tags         orders
+// @Accept       json
+// @Produce      json
+// @Param        orderID path string true "Order ID"
+// @Success      204  {object} domain.OrderResponse "Successfully deleted order"
+// @Failure      404  {object} domain.ErrorResponse   "Order not found"
+// @Failure      500  {object} domain.ErrorResponse   "Internal server error"
+// @Router       /order/{orderID} [delete]
 func (s *OrderService) DeleteOrder(c *fiber.Ctx) error {
 	orderID := c.Params("orderID")
 
@@ -124,7 +170,7 @@ func (s *OrderService) DeleteOrder(c *fiber.Ctx) error {
 	}
 
 	return c.Status(204).JSON(
-		domain.CustomerResponse{
+		domain.OrderResponse{
 			StatusCode: 204,
 			Message:    "Successfully Deleted order",
 		})

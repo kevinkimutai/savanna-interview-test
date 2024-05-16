@@ -10,6 +10,8 @@ migratedown:
 	migrate -path "./migrations" -database "postgresql://root:p@ssw0rd@localhost:5431/orderdb?sslmode=disable" -verbose down 
 test:
 	go test -v -cover ./...
+docs:
+	swag init -g './internal/adapters/server/server.go'
 	 
 
-.PHONY: postgres createdb dropdb migrateup migratedown 
+.PHONY: postgres createdb dropdb migrateup migratedown test docs

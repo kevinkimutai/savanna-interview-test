@@ -1,0 +1,366 @@
+basePath: /api/v1
+definitions:
+  domain.Customer:
+    properties:
+      customer_id:
+        type: string
+      name:
+        type: string
+    type: object
+  domain.CustomerResponse:
+    properties:
+      data:
+        $ref: '#/definitions/domain.Customer'
+      message:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  domain.CustomersResponse:
+    properties:
+      data:
+        $ref: '#/definitions/domain.Customer'
+      message:
+        type: string
+      number_of_pages:
+        type: integer
+      page:
+        type: integer
+      status_code:
+        type: integer
+      total:
+        type: integer
+    type: object
+  domain.ErrorResponse:
+    properties:
+      message:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  domain.Order:
+    properties:
+      created_at:
+        type: string
+      customer_id:
+        type: string
+      order_id:
+        type: string
+      total_amount:
+        type: number
+    type: object
+  domain.OrderItemRequest:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  domain.OrderResponse:
+    properties:
+      data:
+        $ref: '#/definitions/domain.Order'
+      message:
+        type: string
+      status_code:
+        type: integer
+    type: object
+  domain.OrdersResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.Order'
+        type: array
+      message:
+        type: string
+      number_of_pages:
+        type: integer
+      page:
+        type: integer
+      status_code:
+        type: integer
+      total:
+        type: integer
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Order API docs.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Order API
+  version: "1.0"
+paths:
+  /customer:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all customers based on the provided query parameters.
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of customers per page
+        in: query
+        name: limit
+        type: integer
+      - description: Sort by field
+        in: query
+        name: sortBy
+        type: string
+      - description: Sort order ('asc' or 'desc')
+        in: query
+        name: sortOrder
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved customers
+          schema:
+            $ref: '#/definitions/domain.CustomersResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get all customers
+      tags:
+      - customers
+    post:
+      consumes:
+      - application/json
+      description: Creates a new customer with the provided details.
+      parameters:
+      - description: New customer details
+        in: body
+        name: newCustomer
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Customer'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Customer created successfully
+          schema:
+            $ref: '#/definitions/domain.CustomerResponse'
+        "400":
+          description: Bad request, invalid input
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Create a new customer
+      tags:
+      - customers
+  /customer/{customerID}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a customer based on the provided customer ID.
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customerID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully deleted customer
+          schema:
+            $ref: '#/definitions/domain.CustomerResponse'
+        "400":
+          description: Bad request, missing customer ID
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Customer not found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Delete customer by ID
+      tags:
+      - customers
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a customer based on the provided customer ID.
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customerID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved customer
+          schema:
+            $ref: '#/definitions/domain.CustomerResponse'
+        "400":
+          description: Bad request, missing customer ID
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Customer not found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get customer by ID
+      tags:
+      - customers
+  /order:
+    get:
+      description: Retrieves all orders based on the provided query parameters.
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of orders per page
+        in: query
+        name: limit
+        type: integer
+      - description: Sort by field
+        in: query
+        name: sortBy
+        type: string
+      - description: Sort order ('asc' or 'desc')
+        in: query
+        name: sortOrder
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved orders
+          schema:
+            $ref: '#/definitions/domain.OrdersResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get all orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Creates a new order with the provided order items.
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Order items to be added
+        in: body
+        name: orderItems
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/domain.OrderItemRequest'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Returns the newly created order
+          schema:
+            $ref: '#/definitions/domain.OrderResponse'
+        "400":
+          description: Bad request, invalid input
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Customer not found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Create a new order
+      tags:
+      - orders
+  /order/{orderID}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an order based on the provided order ID.
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully deleted order
+          schema:
+            $ref: '#/definitions/domain.OrderResponse'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Delete order by ID
+      tags:
+      - orders
+    get:
+      consumes:
+      - application/json
+      description: Retrieves an order based on the provided order ID.
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved order
+          schema:
+            $ref: '#/definitions/domain.OrderResponse'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get order by ID
+      tags:
+      - orders
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
