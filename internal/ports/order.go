@@ -7,10 +7,7 @@ import (
 )
 
 type OrderRepoPort interface {
-	CreateOrderItem(orderItem domain.OrderItem) (domain.OrderItem, error)
-	CreateOrder(string, string) (domain.Order, error)
-	GetTotalPrice(string) (float64, error)
-	UpdateOrderTotalPrice(string, float64) (domain.Order, error)
+	CreateOrder(orderItems []domain.OrderItem, customerID string) (domain.Order, error)
 	GetOrderByID(orderID string) (domain.Order, error)
 	DeleteOrder(orderID string) error
 	GetAllOrders(params queries.ListOrdersParams) (domain.OrdersFetch, error)

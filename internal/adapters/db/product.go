@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"math"
 	"strconv"
 
@@ -11,6 +12,8 @@ import (
 )
 
 func (db *DBAdapter) CreateProduct(product domain.Product) (domain.Product, error) {
+	ctx := context.Background()
+
 	//convert Float64 To pgtype.numeric
 	var numeric pgtype.Numeric
 	priceStr := strconv.FormatFloat(product.Price, 'f', -1, 64)
@@ -23,7 +26,7 @@ func (db *DBAdapter) CreateProduct(product domain.Product) (domain.Product, erro
 		ImageUrl: product.ImageURL,
 	}
 
-	prod, error := db.queries.CreateProduct(db.ctx, productParams)
+	prod, error := db.queries.CreateProduct(ctx, productParams)
 	if error != nil {
 		return domain.Product{}, error
 	}
@@ -38,16 +41,17 @@ func (db *DBAdapter) CreateProduct(product domain.Product) (domain.Product, erro
 }
 
 func (db *DBAdapter) GetAllProducts(prodParams queries.ListProductsParams) (domain.ProductsFetch, error) {
+	ctx := context.Background()
 
 	//Get Products
-	products, err := db.queries.ListProducts(db.ctx, prodParams)
+	products, err := db.queries.ListProducts(ctx, prodParams)
 	if err != nil {
 		return domain.ProductsFetch{}, err
 
 	}
 
 	//Get Count
-	count, err := db.queries.CountProducts(db.ctx)
+	count, err := db.queries.CountProducts(ctx)
 	if err != nil {
 		return domain.ProductsFetch{}, err
 
@@ -81,13 +85,15 @@ func (db *DBAdapter) GetAllProducts(prodParams queries.ListProductsParams) (doma
 
 }
 func (db *DBAdapter) GetProduct(productID string) (domain.Product, error) {
+	ctx := context.Background()
+
 	prodID, err := utils.ConvertStringToInt64(productID)
 
 	if err != nil {
 		return domain.Product{}, err
 	}
 
-	product, err := db.queries.GetProduct(db.ctx, prodID)
+	product, err := db.queries.GetProduct(ctx, prodID)
 	if err != nil {
 		return domain.Product{}, err
 	}
@@ -102,12 +108,14 @@ func (db *DBAdapter) GetProduct(productID string) (domain.Product, error) {
 
 }
 func (db *DBAdapter) DeleteProduct(productID string) error {
+	ctx := context.Background()
+
 	prodID, err := utils.ConvertStringToInt64(productID)
 	if err != nil {
 		return err
 	}
 
-	err = db.queries.DeleteProduct(db.ctx, prodID)
+	err = db.queries.DeleteProduct(ctx, prodID)
 	if err != nil {
 		return err
 	}

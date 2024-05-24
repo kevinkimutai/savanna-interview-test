@@ -1,8 +1,15 @@
 package server
 
 import (
+	"time"
+
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	_ "github.com/kevinkimutai/savanna-app/docs"
 	"github.com/kevinkimutai/savanna-app/internal/ports"
@@ -54,8 +61,46 @@ func (s *ServerAdapter) Run() {
 	//Initialize Fiber
 	app := fiber.New()
 
+	//Cors Middleware
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:3000",
+		AllowHeaders: "Origin, Content-Type, Accept",
+	}))
+
+	//CSRF Middleware
+	app.Use(csrf.New(csrf.Config{
+		KeyLookup:      "header:X-CSRF-Token",
+		CookieName:     "csrf_",
+		CookieSecure:   true,
+		CookieHTTPOnly: true,
+	}))
+
+	//Helmet
+	app.Use(helmet.New())
+
 	//Logger Middleware
 	app.Use(logger.New())
+
+	//Compress Middleware
+	app.Use(compress.New())
+
+	// Apply Limiter middleware
+	app.Use(limiter.New(limiter.Config{
+		// Max number of requests per duration
+		Max: 30,
+		// Duration for the above limit
+		Expiration: 30 * time.Second,
+		// Key to distinguish between different clients
+		KeyGenerator: func(c *fiber.Ctx) string {
+			return c.IP()
+		},
+		// Handler to execute when limit is reached
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"message": "Too many requests, please try again later.",
+			})
+		},
+	}))
 
 	//Swagger Middleware
 	cfg := swagger.Config{

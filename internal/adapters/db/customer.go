@@ -1,9 +1,14 @@
 package db
 
-import "github.com/kevinkimutai/savanna-app/internal/adapters/queries"
+import (
+	"context"
+
+	"github.com/kevinkimutai/savanna-app/internal/adapters/queries"
+)
 
 func (db *DBAdapter) CreateCustomer(customer queries.CreateCustomerParams) (queries.Customer, error) {
-	cus, err := db.queries.CreateCustomer(db.ctx, customer)
+	ctx := context.Background()
+	cus, err := db.queries.CreateCustomer(ctx, customer)
 	if err != nil {
 		return cus, err
 	}
@@ -12,7 +17,8 @@ func (db *DBAdapter) CreateCustomer(customer queries.CreateCustomerParams) (quer
 }
 
 func (db *DBAdapter) GetCustomerByEmail(email string) (queries.Customer, error) {
-	customer, err := db.queries.GetCustomerByEmail(db.ctx, email)
+	ctx := context.Background()
+	customer, err := db.queries.GetCustomerByEmail(ctx, email)
 	if err != nil {
 		return customer, err
 	}

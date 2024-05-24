@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"encoding/base64"
 	"time"
 
 	"github.com/google/uuid"
@@ -87,6 +88,9 @@ func CheckOrderParams(m map[string]string) OrderParams {
 }
 
 func GenerateUUID() string {
-	id := uuid.New()
-	return id.String()
+	u := uuid.New()
+	// Encode UUID to Base64
+	uBase64 := base64.URLEncoding.EncodeToString(u[:])
+
+	return uBase64
 }

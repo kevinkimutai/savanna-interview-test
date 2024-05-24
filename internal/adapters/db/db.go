@@ -4,19 +4,19 @@ import (
 	"context"
 	"log"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/kevinkimutai/savanna-app/internal/adapters/queries"
 )
 
 type DBAdapter struct {
-	ctx     context.Context
+	conn    *pgxpool.Pool
 	queries *queries.Queries
 }
 
 func NewDB(DBUrl string) *DBAdapter {
 	ctx := context.Background()
 
-	conn, err := pgx.Connect(ctx, DBUrl)
+	conn, err := pgxpool.New(ctx, DBUrl)
 	if err != nil {
 		log.Fatal("Error connecting to db:%w", err)
 	}
@@ -24,6 +24,6 @@ func NewDB(DBUrl string) *DBAdapter {
 
 	queries := queries.New(conn)
 
-	return &DBAdapter{ctx: ctx, queries: queries}
+	return &DBAdapter{conn: conn, queries: queries}
 
 }

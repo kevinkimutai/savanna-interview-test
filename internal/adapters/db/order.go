@@ -1,72 +1,108 @@
 package db
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"math"
 	"strconv"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/kevinkimutai/savanna-app/internal/adapters/queries"
 	"github.com/kevinkimutai/savanna-app/internal/app/core/domain"
 	"github.com/kevinkimutai/savanna-app/internal/utils"
 )
 
-func (db *DBAdapter) CreateOrder(orderID string, customerID string) (domain.Order, error) {
+func (db *DBAdapter) CreateOrder(orderItems []domain.OrderItem, customerID string) (domain.Order, error) {
+	ctx := context.Background()
 
-	//convert to type params
+	// Start Tx
+	tx, err := db.conn.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return domain.Order{}, errors.New("failed to start tx")
+	}
+	qtx := db.queries.WithTx(tx)
+
+	// Save Order
 	orderParams := queries.CreateOrderParams{
-		OrderID:    orderID,
+		OrderID:    orderItems[0].OrderID,
 		CustomerID: pgtype.Text{String: customerID, Valid: true},
 	}
-
-	order, err := db.queries.CreateOrder(db.ctx, orderParams)
+	order, err := qtx.CreateOrder(ctx, orderParams)
 	if err != nil {
+		tx.Rollback(ctx)
 		return domain.Order{}, err
 	}
 
-	//Convert Order To domain.Order
-	newOrder := domain.Order{
-		OrderID:    order.OrderID,
-		CustomerID: order.CustomerID.String,
-		CreatedAt:  order.CreatedAt.Time,
+	// Save each orderItem
+	var items []queries.OrderItem
+	for _, item := range orderItems {
+		productID, err := utils.ConvertStringToInt64(item.ProductID)
+		if err != nil {
+			tx.Rollback(ctx)
+			return domain.Order{}, err
+		}
+
+		orderItem := queries.CreateOrderItemParams{
+			OrderID:   item.OrderID,
+			ProductID: productID,
+			Quantity:  int32(item.Quantity),
+		}
+
+		orderItemResult, err := qtx.CreateOrderItem(ctx, orderItem)
+		if err != nil {
+			tx.Rollback(ctx)
+			return domain.Order{}, err
+		}
+
+		items = append(items, orderItemResult)
 	}
 
-	return newOrder, nil
-
-}
-
-func (db *DBAdapter) GetTotalPrice(orderID string) (float64, error) {
-	totalPrice, err := db.queries.TotalOrderPrice(db.ctx, orderID)
+	// Calculate Total Price
+	totalPrice, err := qtx.TotalOrderPrice(ctx, order.OrderID)
 	if err != nil {
-		return float64(totalPrice), err
+		tx.Rollback(ctx)
+		return domain.Order{}, err
 	}
 
-	return float64(totalPrice), nil
-}
-
-func (db *DBAdapter) UpdateOrderTotalPrice(orderID string, totalPrice float64) (domain.Order, error) {
-	totalPriceStr := strconv.FormatFloat(totalPrice, 'f', 2, 64)
+	// Update Order
 	var numeric pgtype.Numeric
+	totalPricefloat64 := float64(totalPrice)
+	totalPriceStr := strconv.FormatFloat(totalPricefloat64, 'f', 2, 64)
+
 	numeric.Scan(totalPriceStr)
 
 	updateParams := queries.UpdateTotalPriceParams{
-		OrderID:     orderID,
+		OrderID:     order.OrderID,
 		TotalAmount: numeric,
 	}
-	order, err := db.queries.UpdateTotalPrice(db.ctx, updateParams)
+
+	updatedOrder, err := qtx.UpdateTotalPrice(ctx, updateParams)
 	if err != nil {
+		tx.Rollback(ctx)
+		return domain.Order{}, err
+	}
+
+	fmt.Println(updatedOrder.TotalAmount)
+
+	// Commit the transaction
+	if err := tx.Commit(ctx); err != nil {
 		return domain.Order{}, err
 	}
 
 	return domain.Order{
-		OrderID:     order.OrderID,
-		CustomerID:  order.CustomerID.String,
-		TotalAmount: totalPrice,
+		OrderID:     updatedOrder.OrderID,
+		CustomerID:  updatedOrder.CustomerID.String,
+		TotalAmount: utils.ConvertNumericToFloat64(updatedOrder.TotalAmount),
 		CreatedAt:   order.CreatedAt.Time,
 	}, nil
 }
-func (db *DBAdapter) GetOrderByID(orderID string) (domain.Order, error) {
 
-	order, err := db.queries.GetOrder(db.ctx, orderID)
+func (db *DBAdapter) GetOrderByID(orderID string) (domain.Order, error) {
+	ctx := context.Background()
+
+	order, err := db.queries.GetOrder(ctx, orderID)
 	if err != nil {
 		return domain.Order{}, err
 	}
@@ -80,8 +116,9 @@ func (db *DBAdapter) GetOrderByID(orderID string) (domain.Order, error) {
 
 }
 func (db *DBAdapter) DeleteOrder(orderID string) error {
+	ctx := context.Background()
 
-	err := db.queries.DeleteOrder(db.ctx, orderID)
+	err := db.queries.DeleteOrder(ctx, orderID)
 	if err != nil {
 		return err
 	}
@@ -90,15 +127,17 @@ func (db *DBAdapter) DeleteOrder(orderID string) error {
 }
 
 func (db *DBAdapter) GetAllOrders(orderParams queries.ListOrdersParams) (domain.OrdersFetch, error) {
+	ctx := context.Background()
+
 	//Get Orders
-	orders, err := db.queries.ListOrders(db.ctx, orderParams)
+	orders, err := db.queries.ListOrders(ctx, orderParams)
 	if err != nil {
 		return domain.OrdersFetch{}, err
 
 	}
 
 	//Get Count
-	count, err := db.queries.CountOrders(db.ctx)
+	count, err := db.queries.CountOrders(ctx)
 	if err != nil {
 		return domain.OrdersFetch{}, err
 

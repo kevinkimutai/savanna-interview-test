@@ -24,7 +24,7 @@ pipeline {
             steps {
                 echo '--- Running tests ---'
                 // Run tests if any
-                sh 'go test ./...'
+                sh 'go test -cover ./...'
             }
         }
 
