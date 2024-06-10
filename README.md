@@ -29,6 +29,15 @@ From the [Interview Question](https://firebasestorage.googleapis.com/v0/b/creada
   - RABBITMQ_SERVER
 - Run `go run cmd/main.go`
 
+## Swagger Documentation
+
+Find swagger documentation at **/api/v1/swagger**
+![swagger docs](https://firebasestorage.googleapis.com/v0/b/creadable-22c39.appspot.com/o/Screenshot%20from%202024-06-10%2019-34-21.png?alt=media&token=ad34f93d-0e6e-4d46-8e3d-53c9417f6764)
+
+## Architecture
+
+Hexagonal Architecture (Ports and Adapters)
+
 ## Whats Remaining
 
 ### Deployment

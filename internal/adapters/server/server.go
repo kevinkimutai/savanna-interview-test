@@ -56,10 +56,18 @@ func New(
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
-
 func (s *ServerAdapter) Run() {
 	//Initialize Fiber
 	app := fiber.New()
+
+	//Swagger Middleware
+	cfg := swagger.Config{
+		BasePath: "/api/v1/",
+		FilePath: "./docs/swagger.json",
+		Path:     "swagger",
+		Title:    "Swagger Order API Docs",
+	}
+	app.Use(swagger.New(cfg))
 
 	//Cors Middleware
 	app.Use(cors.New(cors.Config{
@@ -101,15 +109,6 @@ func (s *ServerAdapter) Run() {
 			})
 		},
 	}))
-
-	//Swagger Middleware
-	cfg := swagger.Config{
-		BasePath: "/api/v1/",
-		FilePath: "./docs/swagger.json",
-		Path:     "swagger",
-		Title:    "Swagger Order API Docs",
-	}
-	app.Use(swagger.New(cfg))
 
 	// Define routes
 	//app.Route("/api/v1/customer", s.CustomerRouter)
