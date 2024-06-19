@@ -1,7 +1,6 @@
 package db
 
 import (
-	"log"
 	"testing"
 
 	"github.com/kevinkimutai/savanna-app/internal/adapters/queries"
@@ -71,7 +70,6 @@ func TestGetCustomerByEmail(t *testing.T) {
 		_, err := db.GetCustomerByEmail(invalidEmail)
 
 		require.Error(t, err)
-		log.Println(err.Error())
 
 		if err != nil {
 			require.Contains(t, err.Error(), "no rows in result set")

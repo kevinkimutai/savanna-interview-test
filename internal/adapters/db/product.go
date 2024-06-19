@@ -101,7 +101,7 @@ func (db *DBAdapter) GetProduct(productID string) (domain.Product, error) {
 	return domain.Product{
 		ProductID: int(product.ProductID),
 		Name:      product.Name,
-		Price:     float64(product.Price.Exp),
+		Price:     utils.ConvertNumericToFloat64(product.Price),
 		ImageURL:  product.ImageUrl,
 		CreatedAt: product.CreatedAt.Time,
 	}, nil
