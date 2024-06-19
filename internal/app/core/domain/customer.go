@@ -16,19 +16,19 @@ type ErrorResponse struct {
 }
 
 type CustomersFetch struct {
-	Page          uint     `json:"page"`
-	NumberOfPages uint     `json:"number_of_pages"`
-	Total         uint     `json:"total"`
-	Data          Customer `json:"data"`
+	Page          uint       `json:"page"`
+	NumberOfPages uint       `json:"number_of_pages"`
+	Total         uint       `json:"total"`
+	Data          []Customer `json:"data"`
 }
 
 type CustomersResponse struct {
-	StatusCode    uint     `json:"status_code"`
-	Message       string   `json:"message"`
-	Page          uint     `json:"page"`
-	NumberOfPages uint     `json:"number_of_pages"`
-	Total         uint     `json:"total"`
-	Data          Customer `json:"data"`
+	StatusCode    uint       `json:"status_code"`
+	Message       string     `json:"message"`
+	Page          uint       `json:"page"`
+	NumberOfPages uint       `json:"number_of_pages"`
+	Total         uint       `json:"total"`
+	Data          []Customer `json:"data"`
 }
 
 type CustomerParams struct {
@@ -40,6 +40,7 @@ type CustomerParams struct {
 type Customer struct {
 	CustomerID string `json:"customer_id"`
 	Name       string `json:"name"`
+	Email      string `json:"email"`
 }
 
 func NewCustomerDomain(customer Customer) (Customer, error) {
