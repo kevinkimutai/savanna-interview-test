@@ -1,6 +1,7 @@
 package server
 
 import (
+	"os"
 	"time"
 
 	"github.com/gofiber/contrib/swagger"
@@ -74,14 +75,15 @@ func (s *ServerAdapter) Run() {
 		AllowOrigins: "http://localhost:3000",
 		AllowHeaders: "Origin, Content-Type, Accept",
 	}))
-
-	//CSRF Middleware
-	app.Use(csrf.New(csrf.Config{
-		KeyLookup:      "header:X-CSRF-Token",
-		CookieName:     "csrf_",
-		CookieSecure:   true,
-		CookieHTTPOnly: true,
-	}))
+	// Conditionally enable CSRF Middleware
+	if os.Getenv("ENV") != "development" {
+		app.Use(csrf.New(csrf.Config{
+			KeyLookup:      "header:X-CSRF-Token",
+			CookieName:     "csrf_",
+			CookieSecure:   true,
+			CookieHTTPOnly: true,
+		}))
+	}
 
 	//Helmet
 	app.Use(helmet.New())

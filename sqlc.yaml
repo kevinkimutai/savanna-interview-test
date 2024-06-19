@@ -12,3 +12,4 @@ sql:
         package: "queries"
         out: "./internal/adapters/queries"
         sql_package: "pgx/v5"
+        emit_interface: true

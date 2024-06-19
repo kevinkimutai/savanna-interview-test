@@ -152,7 +152,7 @@ func (q *Queries) TotalOrderPrice(ctx context.Context, orderID string) (int64, e
 
 const updateTotalPrice = `-- name: UpdateTotalPrice :one
 UPDATE orders
-  set total_amount = $2 
+  SET total_amount = $2 
 WHERE order_id = $1
 RETURNING order_id, customer_id, total_amount, created_at
 `

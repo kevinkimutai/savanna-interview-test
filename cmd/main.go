@@ -27,13 +27,24 @@ func main() {
 	POSTGRES_USERNAME := os.Getenv("POSTGRES_USERNAME")
 	POSTGRES_PASSWORD := os.Getenv("POSTGRES_PASSWORD")
 	DATABASE_PORT := os.Getenv("DB_PORT")
+	DATABASE_HOST := os.Getenv("DB_HOST")
+	DATABASE_NAME := os.Getenv("DB_NAME")
+	DATABASE_TEST := os.Getenv("TEST_DB")
+
+	var DB string
+
+	if os.Getenv("ENV") != "development" {
+		DB = DATABASE_NAME
+	} else {
+		DB = DATABASE_TEST
+	}
 
 	DBURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
 		POSTGRES_USERNAME,
 		POSTGRES_PASSWORD,
-		"localhost",
+		DATABASE_HOST,
 		DATABASE_PORT,
-		"orderdb")
+		DB)
 
 	RABBITMQSERVER := os.Getenv("RABBITMQ_SERVER")
 

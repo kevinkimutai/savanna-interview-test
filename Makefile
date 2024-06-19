@@ -5,7 +5,7 @@ createdb:
 dropdb: 
 	docker exec -it postgresdb dropdb orderdb
 migrateup:
-	migrate -path "./migrations" -database "postgresql://root:p@ssw0rd@localhost:5431/orderdb?sslmode=disable" -verbose up 
+	migrate -path "./migrations" -database "postgresql://root:p@ssw0rd@localhost:5431/orderdb_test?sslmode=disable" -verbose up 
 migratedown:
 	migrate -path "./migrations" -database "postgresql://root:p@ssw0rd@localhost:5431/orderdb?sslmode=disable" -verbose down 
 test:
