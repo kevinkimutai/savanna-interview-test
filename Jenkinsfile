@@ -63,21 +63,26 @@ pipeline {
         //     }
         // }
 
-        stage('SonarQube analysis') {
-            steps {
-                script {
-                    def scannerHome = tool name: 'sonarqube5.01', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    withSonarQubeEnv('sonarserver') {
-                        withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
-                            sh """
-                            set -o allexport
-                            source $ENV_FILE
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=savanna \
-                            -Dsonar.sources=./ \
-                            -Dsonar.go.coverage.reportPaths=coverage.out \
-                            -Dsonar.go.tests.reportPaths=report.json
-                            """
+        environment {
+        SCANNER_HOME = tool name: 'sonarqube5.01', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+        }
+    
+        stages {
+            stage('SonarQube analysis') {
+                steps {
+                    script {
+                        withSonarQubeEnv('sonarserver') {
+                            withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
+                                sh """
+                                set -o allexport
+                                . $ENV_FILE
+                                ${env.SCANNER_HOME}/bin/sonar-scanner \
+                                -Dsonar.projectKey=savanna \
+                                -Dsonar.sources=./ \
+                                -Dsonar.go.coverage.reportPaths=coverage.out \
+                                -Dsonar.go.tests.reportPaths=report.json
+                                """
+                            }
                         }
                     }
                 }
