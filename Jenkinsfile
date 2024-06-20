@@ -43,27 +43,50 @@ pipeline {
             }
         }
         
-        stage('SonarQube analysis') {
-            steps {
-                echo '--- Running SonarQube analysis ---'
-                script {
-                    withSonarQubeEnv('sonarserver') {
-                        withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
-                            sh """
-                            set -o allexport
-                            . $ENV_FILE
-                            ${env.SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=savanna \
-                            -Dsonar.sources=./ \
-                            -Dsonar.go.coverage.reportPaths=coverage.out \
-                            -Dsonar.go.tests.reportPaths=report.json
-                            """
+        // stage('SonarQube analysis') {
+        //     steps {
+        //         echo '--- Running SonarQube analysis ---'
+        //         script {
+        //             withSonarQubeEnv('sonarserver') {
+        //                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
+        //                     sh """
+        //                     set -o allexport
+        //                     . $ENV_FILE
+        //                     ${env.SCANNER_HOME}/bin/sonar-scanner \
+        //                     -Dsonar.projectKey=savanna \
+        //                     -Dsonar.sources=./ \
+        //                     -Dsonar.go.coverage.reportPaths=coverage.out \
+        //                     -Dsonar.go.tests.reportPaths=report.json
+        //                     """
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        
+
+                stage('SonarQube analysis') {
+                    steps {
+                        echo '--- Running SonarQube analysis ---'
+                        script {
+                            withSonarQubeEnv('sonarserver') {
+                                withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
+                                    sh """
+                                    set -o allexport
+                                    . $ENV_FILE
+                                    echo "Environment variables:"
+                                    env | sort  # Print all environment variables for verification
+                                    ${env.SCANNER_HOME}/bin/sonar-scanner \
+                                    -Dsonar.projectKey=savanna \
+                                    -Dsonar.sources=./ \
+                                    -Dsonar.go.coverage.reportPaths=coverage.out \
+                                    -Dsonar.go.tests.reportPaths=report.json
+                                    """
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
-        
         stage('Deploy') {
             steps {
                 echo '--- Deploying the application ---'
