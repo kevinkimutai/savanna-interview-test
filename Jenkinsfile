@@ -66,11 +66,12 @@ pipeline {
         stage('SonarQube analysis') {
             steps {
                 script {
-                    def scannerHome = tool 'sonarqube5.01' // Replace 'sonarqube5.01' with your tool name
+                    def scannerHome = tool name: 'sonarqube5.01', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('sonarserver') {
                         withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                             sh """
-                            # No need to source the environment file here
+                            set -o allexport
+                            source $ENV_FILE
                             ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=savanna \
                             -Dsonar.sources=./ \
