@@ -41,22 +41,42 @@ pipeline {
             }
         }
 
+        // stage('SonarQube analysis') {
+        //     steps {
+        //         script {
+        //            def scannerHome = tool 'sonarqube5.01'
+        //             withSonarQubeEnv('sonarserver') {
+        //                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
+        //                     sh '''
+        //                     set -o allexport
+        //                     . $ENV_FILE
+        //                     set -o allexport
+        //                     . ${scannerHome}/bin/sonar-scanner \
+        //                     -Dsonar.projectKey=savanna \
+        //                     -Dsonar.sources=./ \
+        //                     -Dsonar.go.coverage.reportPaths=coverage.out \
+        //                     -Dsonar.go.tests.reportPaths=report.json
+        //                     '''
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
         stage('SonarQube analysis') {
             steps {
                 script {
-                   def scannerHome = tool 'sonarqube5.01'
+                    def scannerHome = tool 'sonarqube5.01' // Replace 'sonarqube5.01' with your tool name
                     withSonarQubeEnv('sonarserver') {
                         withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
-                            sh '''
-                            set -o allexport
-                            . $ENV_FILE
-                            set -o allexport
+                            sh """
+                            # No need to source the environment file here
                             ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=savanna \
                             -Dsonar.sources=./ \
                             -Dsonar.go.coverage.reportPaths=coverage.out \
                             -Dsonar.go.tests.reportPaths=report.json
-                            '''
+                            """
                         }
                     }
                 }
