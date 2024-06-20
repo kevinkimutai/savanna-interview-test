@@ -2,14 +2,14 @@ pipeline {
     agent any
     
     tools { 
-        go 'go1.22.1' 
+        go 'go1.22.1'
+        sonarqube 'sonarqube5.01'
     }
     
     stages {
         stage('Checkout') {
             steps {
                 echo '--- Checking out the code from version control ---'
-                // Checkout your code from version control (e.g., Git)
                 git branch: 'main', url: 'https://github.com/kevinkimutai/savanna-interview-test'
             }
         }
@@ -17,7 +17,6 @@ pipeline {
         stage('Build') {
             steps {
                 echo '--- Building the GoLang application ---'
-                // Source the environment variables from the .env file
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                     sh '''
                     set -o allexport
@@ -32,7 +31,6 @@ pipeline {
         stage('Test') {
             steps {
                 echo '--- Running tests ---'
-                // Source the environment variables from the .env file
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                     sh '''
                     set -o allexport
@@ -69,7 +67,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '--- Deploying the application ---'
-                // Source the environment variables from the .env file
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                     sh '''
                     set -o allexport
@@ -87,7 +84,6 @@ pipeline {
     post {
         always {
             echo '--- Cleaning up workspace ---'
-            // Clean up workspace after build
             cleanWs()
         }
     }
