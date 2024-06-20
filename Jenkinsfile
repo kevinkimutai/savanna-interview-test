@@ -44,7 +44,7 @@ pipeline {
         stage('SonarQube analysis') {
             steps {
                 script {
-                    def scannerHome = tool name: 'sonarqube5.01', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                   def scannerHome = tool 'sonarqube5.01'
                     withSonarQubeEnv('sonarserver') {
                         withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                             sh '''
