@@ -1,11 +1,11 @@
 pipeline {
     agent any
-    
+
     tools { 
         go 'go1.22.1'
-        sonarqube 'sonarqube5.01'
+        sonarRunner 'sonarqube5.01' // Use sonarRunner instead of sonarqube
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
@@ -45,7 +45,7 @@ pipeline {
         stage('SonarQube analysis') {
             steps {
                 script {
-                    def scannerHome = tool 'sonarqube5.01'
+                    def scannerHome = tool 'sonarqube5.01' // Note the use of sonarRunner tool name
                     withSonarQubeEnv('sonarserver') {
                         withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                             sh '''
