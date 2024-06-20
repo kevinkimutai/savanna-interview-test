@@ -34,7 +34,7 @@ pipeline {
                     def scannerHome = tool 'sonarqube5.01'
                     withSonarQubeEnv('sonarserver') {
                         sh "${scannerHome}/bin/sonar-scanner \
-                    -Dsonar.projectKey=my_go_project \
+                    -Dsonar.projectKey=savanna \
                     -Dsonar.sources=./ \
                     -Dsonar.go.coverage.reportPaths=coverage.out \
                     -Dsonar.go.tests.reportPaths=report.json"
