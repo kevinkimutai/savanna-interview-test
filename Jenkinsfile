@@ -21,7 +21,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                     sh '''
                     set -o allexport
-                    source $ENV_FILE
+                    . $ENV_FILE
                     set -o allexport
                     go build -o main ./cmd/main.go
                     '''
@@ -36,7 +36,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                     sh '''
                     set -o allexport
-                    source $ENV_FILE
+                    . $ENV_FILE
                     set -o allexport
                     go test -cover ./...
                     '''
@@ -52,7 +52,7 @@ pipeline {
                         withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                             sh '''
                             set -o allexport
-                            source $ENV_FILE
+                            . $ENV_FILE
                             set -o allexport
                             ${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=savanna \
@@ -73,7 +73,7 @@ pipeline {
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
                     sh '''
                     set -o allexport
-                    source $ENV_FILE
+                    . $ENV_FILE
                     set -o allexport
                     echo "Deploying the application"
                     // Example: Deploy to Kubernetes
