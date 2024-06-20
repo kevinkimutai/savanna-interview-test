@@ -1,10 +1,14 @@
 pipeline {
     agent any
-
-    tools { 
+    
+    environment {
+        SCANNER_HOME = tool name: 'sonarqube5.01', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+    }
+    
+    tools {
         go 'go1.22.1'
     }
-
+    
     stages {
         stage('Checkout') {
             steps {
@@ -20,7 +24,6 @@ pipeline {
                     sh '''
                     set -o allexport
                     . $ENV_FILE
-                    set -o allexport
                     go build -o main ./cmd/main.go
                     '''
                 }
@@ -34,55 +37,27 @@ pipeline {
                     sh '''
                     set -o allexport
                     . $ENV_FILE
-                    set -o allexport
                     go test -cover ./...
                     '''
                 }
             }
         }
-
-        // stage('SonarQube analysis') {
-        //     steps {
-        //         script {
-        //            def scannerHome = tool 'sonarqube5.01'
-        //             withSonarQubeEnv('sonarserver') {
-        //                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
-        //                     sh '''
-        //                     set -o allexport
-        //                     . $ENV_FILE
-        //                     set -o allexport
-        //                     . ${scannerHome}/bin/sonar-scanner \
-        //                     -Dsonar.projectKey=savanna \
-        //                     -Dsonar.sources=./ \
-        //                     -Dsonar.go.coverage.reportPaths=coverage.out \
-        //                     -Dsonar.go.tests.reportPaths=report.json
-        //                     '''
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-        environment {
-        SCANNER_HOME = tool name: 'sonarqube5.01', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-        }
-    
-        stages {
-            stage('SonarQube analysis') {
-                steps {
-                    script {
-                        withSonarQubeEnv('sonarserver') {
-                            withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
-                                sh """
-                                set -o allexport
-                                . $ENV_FILE
-                                ${env.SCANNER_HOME}/bin/sonar-scanner \
-                                -Dsonar.projectKey=savanna \
-                                -Dsonar.sources=./ \
-                                -Dsonar.go.coverage.reportPaths=coverage.out \
-                                -Dsonar.go.tests.reportPaths=report.json
-                                """
-                            }
+        
+        stage('SonarQube analysis') {
+            steps {
+                echo '--- Running SonarQube analysis ---'
+                script {
+                    withSonarQubeEnv('sonarserver') {
+                        withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
+                            sh """
+                            set -o allexport
+                            . $ENV_FILE
+                            ${env.SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=savanna \
+                            -Dsonar.sources=./ \
+                            -Dsonar.go.coverage.reportPaths=coverage.out \
+                            -Dsonar.go.tests.reportPaths=report.json
+                            """
                         }
                     }
                 }
@@ -96,7 +71,6 @@ pipeline {
                     sh '''
                     set -o allexport
                     . $ENV_FILE
-                    set -o allexport
                     echo "Deploying the application"
                     // Example: Deploy to Kubernetes
                     // sh 'kubectl apply -f deployment.yaml'
