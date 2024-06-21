@@ -2,7 +2,9 @@ pipeline {
     agent any
     
     environment {
-        SCANNER_HOME = tool name: 'sonarqube5.01', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+        SCANNER_HOME = tool name: 'sonarqube5.01', type: 'hudson.plugins.sonar.SonarRunnerInstallation'\
+        registry = 'kevinkimutai/savanna_order'
+        registryCredential = 'dockerhub'
     }
     
     tools {
@@ -87,7 +89,7 @@ pipeline {
                         }
                     }
                 }
-        stage('Deploy') {
+        stage('Docker') {
             steps {
                 echo '--- Deploying the application ---'
                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {

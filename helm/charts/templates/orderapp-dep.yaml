@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderapp
+  labels:
+    app: orderapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orderapp
+  template:
+    metadata:
+      labels:
+        app: orderapp
+    spec:
+      containers:
+        - name: orderapp
+          image: kevinkimutai/orderapp:1.0
+          ports:
+            - name: orderapp-port
+              containerPort: 8000
+      initContainers:
+        - name: init-mydb
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "until nslookup postgres.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for postgres sleep 2; done;",
+            ]
+        - name: init-rabbitmq
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "until nslookup rabbitmq.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for rabbitmq; sleep 2; done;",
+            ]

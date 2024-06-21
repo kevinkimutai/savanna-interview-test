@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-db-data
+          ports:
+            - name: postgres-port
+              containerPort: 5432
+          env:
+            - name: POSTGRES_PASSWORD
+              value: "p@ssw0rd"
+            - name: POSTGRES_USER
+              value: "root"
+      nodeSelector:
+        zone: us-east-1a
+      volumes:
+        - name: postgres-db-data
+          awsElasticBlockStore:
+            volumeID: vol-0f5d55ca629e1d240
+            fsType: ext4
+      initContainers:
+        - name: init-cleanup
+          image: busybox:latest
+          command: ["sh", "-c", "rm -rf /var/lib/postgresql/data/lost+found"]
+          volumeMounts:
+            - name: postgres-db-data
+              mountPath: /var/lib/postgresql/data

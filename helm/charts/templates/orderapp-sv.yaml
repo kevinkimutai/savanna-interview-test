@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: orderapp-service
+spec:
+  ports:
+    - port: 80
+      targetPort: orderapp-port
+      protocol: TCP
+  selector:
+    app: orderapp
+  type: LoadBalancer
