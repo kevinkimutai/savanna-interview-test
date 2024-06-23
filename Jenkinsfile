@@ -44,28 +44,7 @@ pipeline {
                 }
             }
         }
-        
-        // stage('SonarQube analysis') {
-        //     steps {
-        //         echo '--- Running SonarQube analysis ---'
-        //         script {
-        //             withSonarQubeEnv('sonarserver') {
-        //                 withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
-        //                     sh """
-        //                     set -o allexport
-        //                     . $ENV_FILE
-        //                     ${env.SCANNER_HOME}/bin/sonar-scanner \
-        //                     -Dsonar.projectKey=savanna \
-        //                     -Dsonar.sources=./ \
-        //                     -Dsonar.go.coverage.reportPaths=coverage.out \
-        //                     -Dsonar.go.tests.reportPaths=report.json
-        //                     """
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        
+                
 
                 stage('SonarQube analysis') {
                     steps {
@@ -89,21 +68,41 @@ pipeline {
                         }
                     }
                 }
-        stage('Docker') {
-            steps {
-                echo '--- Deploying the application ---'
-                withCredentials([file(credentialsId: 'env-file', variable: 'ENV_FILE')]) {
-                    sh '''
-                    set -o allexport
-                    . $ENV_FILE
-                    echo "Deploying the application"
-                    // Example: Deploy to Kubernetes
-                    // sh 'kubectl apply -f deployment.yaml'
-                    '''
+
+
+        stage('Building image') {
+            steps{
+                script {
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
                 }
             }
         }
+        
+        stage('Deploy Image') {
+          steps{
+            script {
+              docker.withRegistry( '', registryCredential ) {
+                dockerImage.push("$BUILD_NUMBER")
+                dockerImage.push('latest')
+              }
+            }
+          }
+        }
+
+        stage('Remove Unused docker image') {
+          steps{
+            sh "docker rmi $registry:$BUILD_NUMBER"
+          }
+        }
     }
+
+      stage('Kubernetes Deploy') {
+	  agent { label 'KOPS' }
+            steps {
+                    sh "helm upgrade --install --force savanna_order helm/charts--set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+            }
+        }
+
     
     post {
         always {
