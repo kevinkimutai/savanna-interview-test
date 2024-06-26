@@ -9,7 +9,7 @@ type MockOrderApiPort struct {
 	mock.Mock
 }
 
-func (m *MockOrderApiPort) CreateOrder(items []domain.OrderItem, customerID string) (domain.Order, error) {
+func (m *MockOrderApiPort) CreateOrder(items []domain.OrderItem, phonenumber int, customerID string) (domain.Order, error) {
 	args := m.Called(items, customerID)
 	return args.Get(0).(domain.Order), args.Error(1)
 }

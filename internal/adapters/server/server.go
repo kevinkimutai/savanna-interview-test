@@ -73,7 +73,8 @@ func (s *ServerAdapter) Run() {
 	//Cors Middleware
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "http://localhost:3000",
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowMethods: "GET,POST,PUT,DELETE",
+		AllowHeaders: "Origin, Content-Type, Authorization, Accept",
 	}))
 	// Conditionally enable CSRF Middleware
 	if os.Getenv("ENV") != "development" {

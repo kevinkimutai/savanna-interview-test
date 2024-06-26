@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+type OrderRequest struct {
+	PhoneNumber int                `json:"phone_number"`
+	OrderItems  []OrderItemRequest `json:"order_items"`
+}
 type OrderItemRequest struct {
 	ProductID string `json:"product_id"`
 	Quantity  uint   `json:"quantity"`

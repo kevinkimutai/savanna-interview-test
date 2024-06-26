@@ -41,10 +41,10 @@ func (s *OrderService) CreateOrder(c *fiber.Ctx) error {
 	}
 
 	//Receive OrderItems
-	orderItems := []domain.OrderItemRequest{}
+	orderReq := domain.OrderRequest{}
 
 	//Bind To struct
-	if err := c.BodyParser(&orderItems); err != nil {
+	if err := c.BodyParser(&orderReq); err != nil {
 		return c.Status(500).JSON(
 			domain.ErrorResponse{
 				StatusCode: 500,
@@ -56,10 +56,10 @@ func (s *OrderService) CreateOrder(c *fiber.Ctx) error {
 	uuid := domain.GenerateUUID()
 
 	//Add UUID to each struct
-	items := addUUID(uuid, orderItems)
+	items := addUUID(uuid, orderReq.OrderItems)
 
 	//Api
-	order, err := s.api.CreateOrder(items, customer.CustomerID)
+	order, err := s.api.CreateOrder(items, orderReq.PhoneNumber, customer.CustomerID)
 	if err != nil {
 		return c.Status(500).JSON(domain.ErrorResponse{
 			StatusCode: 500,

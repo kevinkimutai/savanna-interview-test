@@ -23,7 +23,7 @@ COPY --from=build-stage /app/main /main
 COPY --from=build-stage /app/.env /.env
 COPY --from=build-stage /app/docs /docs
 
-EXPOSE 8000
+EXPOSE 8080
 
 
 ENTRYPOINT ["/main"]

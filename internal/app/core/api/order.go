@@ -15,7 +15,7 @@ func NewOrderRepo(db ports.OrderRepoPort, queue ports.QueuePort) *OrderRepo {
 	return &OrderRepo{db: db, queue: queue}
 }
 
-func (r *OrderRepo) CreateOrder(orderItems []domain.OrderItem, customerID string) (domain.Order, error) {
+func (r *OrderRepo) CreateOrder(orderItems []domain.OrderItem, phonenumber int, customerID string) (domain.Order, error) {
 
 	//CreateOrder
 	order, err := r.db.CreateOrder(orderItems, customerID)
@@ -25,7 +25,7 @@ func (r *OrderRepo) CreateOrder(orderItems []domain.OrderItem, customerID string
 
 	//rabbitmqMsg
 	//TODO:GET CUSTOMER DETAILS/PHONE_NUMBER/NAME
-	r.queue.SendSMSQueue(order, 254722670831, "Kevin Kimutai")
+	r.queue.SendSMSQueue(order, uint(phonenumber), "Kevin Kimutai")
 
 	//Return Order
 	return order, nil
