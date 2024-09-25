@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"errors"
-	"fmt"
 	"math"
 	"strconv"
 
@@ -83,8 +82,6 @@ func (db *DBAdapter) CreateOrder(orderItems []domain.OrderItem, customerID strin
 		tx.Rollback(ctx)
 		return domain.Order{}, err
 	}
-
-	fmt.Println(updatedOrder.TotalAmount)
 
 	// Commit the transaction
 	if err := tx.Commit(ctx); err != nil {

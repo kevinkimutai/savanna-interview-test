@@ -21,7 +21,7 @@ type OrderHandlerPort interface {
 }
 
 type OrderApiPort interface {
-	CreateOrder([]domain.OrderItem, int, string) (domain.Order, error)
+	CreateOrder([]domain.OrderItem, int, queries.Customer) (domain.Order, error)
 	GetAllOrders(domain.OrderParams) (domain.OrdersFetch, error)
 	GetOrderByID(string) (domain.Order, error)
 	DeleteOrder(string) error

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"github.com/kevinkimutai/savanna-app/internal/adapters/queries"
 	"github.com/kevinkimutai/savanna-app/internal/app/core/domain"
 	"github.com/kevinkimutai/savanna-app/internal/ports"
 	"github.com/kevinkimutai/savanna-app/internal/utils"
@@ -15,17 +16,16 @@ func NewOrderRepo(db ports.OrderRepoPort, queue ports.QueuePort) *OrderRepo {
 	return &OrderRepo{db: db, queue: queue}
 }
 
-func (r *OrderRepo) CreateOrder(orderItems []domain.OrderItem, phonenumber int, customerID string) (domain.Order, error) {
+func (r *OrderRepo) CreateOrder(orderItems []domain.OrderItem, phonenumber int, customer queries.Customer) (domain.Order, error) {
 
 	//CreateOrder
-	order, err := r.db.CreateOrder(orderItems, customerID)
+	order, err := r.db.CreateOrder(orderItems, customer.CustomerID)
 	if err != nil {
 		return order, err
 	}
 
 	//rabbitmqMsg
-	//TODO:GET CUSTOMER DETAILS/PHONE_NUMBER/NAME
-	r.queue.SendSMSQueue(order, uint(phonenumber), "Kevin Kimutai")
+	r.queue.SendSMSQueue(order, uint(phonenumber), customer.Name)
 
 	//Return Order
 	return order, nil
@@ -33,13 +33,14 @@ func (r *OrderRepo) CreateOrder(orderItems []domain.OrderItem, phonenumber int, 
 }
 
 func (r *OrderRepo) GetOrderByID(orderID string) (domain.Order, error) {
-	//TODO:HANDLE ERRORS
+
 	order, err := r.db.GetOrderByID(orderID)
 
 	return order, err
 }
+
 func (r *OrderRepo) DeleteOrder(orderID string) error {
-	//TODO:HANDLE ERRORS
+
 	err := r.db.DeleteOrder(orderID)
 
 	return err

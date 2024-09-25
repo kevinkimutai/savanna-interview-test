@@ -25,6 +25,7 @@ func (r *ProductRepo) GetAllProducts(prodParams domain.ProductParams) (domain.Pr
 	//GetAPIParams
 	params := utils.GetProductAPIParams(prodParams)
 
+	//DB
 	data, err := r.db.GetAllProducts(params)
 
 	return data, err

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/kevinkimutai/savanna-app/internal/adapters/queries"
 	"github.com/kevinkimutai/savanna-app/internal/app/core/domain"
 	"github.com/stretchr/testify/mock"
 )
@@ -9,8 +10,8 @@ type MockOrderApiPort struct {
 	mock.Mock
 }
 
-func (m *MockOrderApiPort) CreateOrder(items []domain.OrderItem, phonenumber int, customerID string) (domain.Order, error) {
-	args := m.Called(items, customerID)
+func (m *MockOrderApiPort) CreateOrder(items []domain.OrderItem, phonenumber int, customer queries.Customer) (domain.Order, error) {
+	args := m.Called(items, customer.CustomerID)
 	return args.Get(0).(domain.Order), args.Error(1)
 }
 

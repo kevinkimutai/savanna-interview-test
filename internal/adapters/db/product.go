@@ -51,7 +51,12 @@ func (db *DBAdapter) GetAllProducts(prodParams queries.ListProductsParams) (doma
 	}
 
 	//Get Count
-	count, err := db.queries.CountProducts(ctx)
+	count, err := db.queries.CountProducts(ctx, queries.CountProductsParams{
+		Column1: prodParams.Column1,
+		Price:   prodParams.Price,
+		Price_2: prodParams.Price_2,
+	})
+
 	if err != nil {
 		return domain.ProductsFetch{}, err
 

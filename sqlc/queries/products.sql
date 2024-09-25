@@ -7,10 +7,9 @@ SELECT * FROM products
 WHERE (name ILIKE '%' || $1 || '%' OR $1 IS NULL)
   AND (price >= $2 OR $2 IS NULL)
   AND (price <= $3 OR $3 IS NULL)
-  AND (created_at >= $4 OR $4 IS NULL)
-  AND (created_at <= $5 OR $5 IS NULL)
-ORDER BY product_id
-LIMIT $6 OFFSET $7;
+ORDER BY created_at
+LIMIT $4 OFFSET $5;
+
 
 -- name: CreateProduct :one
 INSERT INTO products (
@@ -33,4 +32,7 @@ DELETE FROM products
 WHERE product_id = $1;
 
 -- name: CountProducts :one
-SELECT COUNT(*) FROM products;
+SELECT COUNT(*) FROM products
+WHERE (name ILIKE '%' || $1 || '%' OR $1 IS NULL)
+  AND (price >= $2 OR $2 IS NULL)
+  AND (price <= $3 OR $3 IS NULL);

@@ -68,6 +68,7 @@ pipeline {
                         }
                     }
                 }
+                //TODO:ADD QUALITY GATES
 
 
         stage('Building image') {

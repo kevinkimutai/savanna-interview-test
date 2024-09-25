@@ -34,8 +34,6 @@ type ProductParams struct {
 	Limit      string
 	PriceStart string
 	PriceEnd   string
-	StartDate  string
-	EndDate    string
 }
 
 type Product struct {
@@ -79,12 +77,12 @@ func CheckProductsParams(m map[string]string) ProductParams {
 	if m["price_end"] != "" {
 		prodParams.PriceEnd = m["price_end"]
 	}
-	if m["start_date"] != "" {
-		prodParams.StartDate = m["start_date"]
-	}
-	if m["end_date"] != "" {
-		prodParams.EndDate = m["end_date"]
-	}
+	// if m["start_date"] != "" {
+	// 	prodParams.StartDate = m["start_date"]
+	// }
+	// if m["end_date"] != "" {
+	// 	prodParams.EndDate = m["end_date"]
+	// }
 
 	return prodParams
 

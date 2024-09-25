@@ -39,6 +39,7 @@ func main() {
 		DB = DATABASE_TEST
 	}
 
+	fmt.Println(DB)
 	DBURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
 		POSTGRES_USERNAME,
 		POSTGRES_PASSWORD,

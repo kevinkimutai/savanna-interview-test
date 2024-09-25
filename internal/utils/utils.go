@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -41,7 +42,6 @@ var LIMIT, OFFSET int32 = 10, 0
 
 func GetProductAPIParams(params domain.ProductParams) queries.ListProductsParams {
 	var searchStr pgtype.Text
-	var release_date_start, release_date_end pgtype.Date
 	var start_price, end_price pgtype.Numeric
 
 	//Get Params
@@ -52,25 +52,13 @@ func GetProductAPIParams(params domain.ProductParams) queries.ListProductsParams
 	if params.PriceStart != "" {
 		//convert to float64 first
 		price, _ := strconv.ParseFloat(params.PriceStart, 64)
-		start_price.Scan(price)
+		start_price = ConvertFloat64ToNumeric(price)
 	}
 
 	if params.PriceEnd != "" {
 		//convert to float64 first
 		price, _ := strconv.ParseFloat(params.PriceEnd, 64)
-		start_price.Scan(price)
-	}
-
-	if params.StartDate != "" {
-		//convert to type time
-		date, _ := time.Parse("2006-01-02", params.StartDate)
-		release_date_start.Scan(date)
-	}
-
-	if params.EndDate != "" {
-		//convert to type time
-		date, _ := time.Parse("2006-01-02", params.EndDate)
-		release_date_end.Scan(date)
+		end_price = ConvertFloat64ToNumeric(price)
 	}
 
 	if params.Limit != "" {
@@ -91,13 +79,11 @@ func GetProductAPIParams(params domain.ProductParams) queries.ListProductsParams
 	}
 
 	return queries.ListProductsParams{
-		Column1:     searchStr,
-		Price:       start_price,
-		Price_2:     end_price,
-		CreatedAt:   pgtype.Timestamptz(release_date_start),
-		CreatedAt_2: pgtype.Timestamptz(release_date_end),
-		Limit:       LIMIT,
-		Offset:      OFFSET,
+		Column1: searchStr,
+		Price:   start_price,
+		Price_2: end_price,
+		Limit:   LIMIT,
+		Offset:  OFFSET,
 	}
 }
 func GetOrderAPIParams(params domain.OrderParams) queries.ListOrdersParams {
@@ -164,4 +150,20 @@ func GetOrderAPIParams(params domain.OrderParams) queries.ListOrdersParams {
 
 func GetPage(offset, limit int32) uint {
 	return uint((offset / limit) + 1)
+}
+
+func ConvertFloat64ToNumeric(f float64) pgtype.Numeric {
+	// Convert float64 to string with desired precision (e.g., 2 decimal places)
+	strVal := strconv.FormatFloat(f, 'f', -2, 64)
+
+	// Create a new pgtype.Numeric object
+	numeric := pgtype.Numeric{}
+
+	// Scan the string representation using pgtype.Scan
+	err := numeric.Scan(strVal)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return numeric
 }

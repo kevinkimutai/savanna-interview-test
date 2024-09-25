@@ -59,7 +59,7 @@ func (s *OrderService) CreateOrder(c *fiber.Ctx) error {
 	items := addUUID(uuid, orderReq.OrderItems)
 
 	//Api
-	order, err := s.api.CreateOrder(items, orderReq.PhoneNumber, customer.CustomerID)
+	order, err := s.api.CreateOrder(items, orderReq.PhoneNumber, customer)
 	if err != nil {
 		return c.Status(500).JSON(domain.ErrorResponse{
 			StatusCode: 500,
